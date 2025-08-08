@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Name — Researcher</title>
+  <meta name="description" content="Personal academic website for a researcher: publications, teaching, projects, and contact." />
+  <meta property="og:title" content="Your Name — Researcher" />
+  <meta property="og:description" content="Personal academic website: publications, teaching, projects, and contact." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://your-github-username.github.io/" />
+  <meta property="og:image" content="https://your-github-username.github.io/assets/og-card.png" />
+  <link rel="icon" href="assets/favicon.png" />
+  <style>
+    :root{
+      --bg: #0b0c10; /* dark background */
+      --surface: #111318;
+      --text: #e6e6e6;
+      --muted: #a7a7a7;
+      --brand: #4f7cff;
+      --accent: #7bd389;
+      --card: #151922;
+      --border: #242834;
+      --link: #9ab4ff;
+    }
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg: #ffffff;
+        --surface: #f7f8fa;
+        --text: #0e1116;
+        --muted: #475169;
+        --brand: #315efb;
+        --accent: #2f9e44;
+        --card: #ffffff;
+        --border: #e6e9ef;
+        --link: #254eda;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"}
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1000px; margin:0 auto; padding:24px}
+    header{display:flex; gap:24px; align-items:center; padding:24px 0; border-bottom:1px solid var(--border)}
+    .avatar{width:92px; height:92px; border-radius:50%; object-fit:cover; border:2px solid var(--border)}
+    .title h1{margin:0 0 6px; font-size:30px; letter-spacing:.2px}
+    .title .affil{color:var(--muted)}
+    .chipset{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+    .chip{border:1px solid var(--border); background:var(--card); color:var(--text); padding:6px 10px; border-radius:999px; font-size:13px}
+    nav{display:flex; gap:16px; flex-wrap:wrap; margin-left:auto; font-weight:600}
+    nav a{padding:8px 10px; border-radius:10px}
+    nav a.active, nav a:hover{background:var(--surface)}
+
+    section{padding:28px 0; border-bottom:1px solid var(--border)}
+    h2{margin:0 0 14px; font-size:22px}
+    p{margin:10px 0}
+
+    .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px}
+    .card{background:var(--card); border:1px solid var(--border); padding:18px; border-radius:16px}
+    .card h3{margin:0 0 6px; font-size:18px}
+    .meta{color:var(--muted); font-size:14px}
+
+    .pub-tools{display:flex; gap:8px; align-items:center; margin:10px 0 14px}
+    .pub-tools input{flex:1; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)}
+    .pub{margin:14px 0}
+    .pub b{font-weight:600}
+    .tag{display:inline-block; padding:3px 8px; margin-right:8px; border-radius:999px; background:var(--surface); color:var(--muted); font-size:12px}
+
+    .grid-two{display:grid; grid-template-columns:1.2fr .8fr; gap:20px}
+    @media (max-width:800px){.grid-two{grid-template-columns:1fr}}
+
+    footer{padding:24px 0; color:var(--muted); font-size:14px}
+    .btn{display:inline-block; background:var(--brand); color:#fff; padding:8px 12px; border-radius:10px; font-weight:600}
+    .btn.secondary{background:transparent; color:var(--text); border:1px solid var(--border)}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Your Name",
+    "affiliation": {
+      "@type": "Organization",
+      "name": "Your Department, Your University"
+    },
+    "jobTitle": "Assistant Professor",
+    "url": "https://your-github-username.github.io/",
+    "email": "mailto:you@university.edu",
+    "sameAs": [
+      "https://scholar.google.com/citations?user=XXXX",
+      "https://orcid.org/0000-0000-0000-0000",
+      "https://www.semanticscholar.org/author/XXXX",
+      "https://github.com/your-github-username",
+      "https://www.linkedin.com/in/your-handle"
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img class="avatar" src="assets/avatar.jpg" alt="Portrait of Your Name" />
+      <div class="title">
+        <h1>Your Name</h1>
+        <div class="affil">Assistant Professor, Department of X • University of Y</div>
+        <div class="chipset">
+          <span class="chip">Quantum Information</span>
+          <span class="chip">Random Matrix Theory</span>
+          <span class="chip">C# / .NET</span>
+        </div>
+      </div>
+      <nav>
+        <a href="#research" class="active">Research</a>
+        <a href="#publications">Publications</a>
+        <a href="#teaching">Teaching</a>
+        <a href="#service">Service</a>
+        <a href="#cv">CV</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section id="research" class="grid-two">
+      <div>
+        <h2>Research</h2>
+        <p>My work focuses on <b>entanglement estimation</b>, <b>cumulant structures</b>, and <b>random matrix theory</b>, with applications to quantum information science. I enjoy building conceptual bridges between matrix-level and kernel-level results.</p>
+        <p><a class="btn" href="#publications">Browse selected papers</a>
+           <a class="btn secondary" href="https://scholar.google.com/citations?user=XXXX">Google Scholar</a></p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <h3>Current Projects</h3>
+          <div class="meta">2024—present</div>
+          <ul>
+            <li>Cumulants of von Neumann entropy via structural decoupling</li>
+            <li>Time-evolving entanglement under stochastic dynamics</li>
+            <li>Teaching-focused tooling for advanced C#/.NET</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Prospective Students</h3>
+          <div class="meta">Open</div>
+          <p>I welcome motivated students interested in quantum computing, probability, and numerical experiments. Send a brief CV and a paragraph on your interests.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="publications">
+      <h2>Publications</h2>
+      <div class="pub-tools">
+        <input id="pubSearch" type="search" placeholder="Filter by keyword, venue, or year…" />
+        <a class="btn secondary" href="assets/Publications.bib" download>Download BibTeX</a>
+      </div>
+      <div id="pubList">
+        <!-- Example publication items. Duplicate and edit. -->
+        <div class="pub" data-year="2025" data-venue="IMRN" data-keywords="cumulants entropy random matrix">
+          <div class="tag">2025</div><div class="tag">IMRN</div>
+          <div><b>Title of the Paper</b> — with Coauthor A, Coauthor B. <i>International Mathematics Research Notices</i> (2025), 1–20. <a href="#">PDF</a> · <a href="#">arXiv</a> · <a href="#">code</a></div>
+        </div>
+        <div class="pub" data-year="2024" data-venue="CMP" data-keywords="Bessel nonintersecting polynomials">
+          <div class="tag">2024</div><div class="tag">CMP</div>
+          <div><b>Another Paper</b> — with Coauthor C. <i>Communications in Mathematical Physics</i> 286 (2024): 217–275. <a href="#">PDF</a> · <a href="#">arXiv</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="teaching">
+      <h2>Teaching</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>CS 5110: Advanced C# and .NET</h3>
+          <div class="meta">Spring 2025</div>
+          <p>LINQ, generics, async/await, and event-driven programming. <a href="#">Syllabus</a></p>
+        </div>
+        <div class="card">
+          <h3>Intro to Quantum Computing</h3>
+          <div class="meta">Fall 2024</div>
+          <p>States, gates, measurement; hands-on with simple circuits. <a href="#">Syllabus</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="service">
+      <h2>Service</h2>
+      <ul>
+        <li>Reviewer: PRL, JMP, SIAM J. Matrix Anal. Appl.</li>
+        <li>Organizer: Random Matrix & Quantum Info Seminar (2023—)</li>
+      </ul>
+    </section>
+
+    <section id="cv">
+      <h2>CV</h2>
+      <p><a class="btn" href="assets/YourName_CV.pdf">Download CV (PDF)</a></p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p><b>Email:</b> you@university.edu · <b>Office:</b> Room 123, Science Building</p>
+      <p>
+        <a href="https://orcid.org/0000-0000-0000-0000">ORCID</a> ·
+        <a href="https://github.com/your-github-username">GitHub</a> ·
+        <a href="https://scholar.google.com/citations?user=XXXX">Google Scholar</a> ·
+        <a href="https://www.linkedin.com/in/your-handle">LinkedIn</a>
+      </p>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Your Name. Built with GitHub Pages.
+    </footer>
+  </div>
+
+  <script>
+    // Year stamp
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Simple client-side publication filter
+    const input = document.getElementById('pubSearch');
+    const pubs = Array.from(document.querySelectorAll('#pubList .pub'));
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      pubs.forEach(p => {
+        const hay = p.textContent.toLowerCase();
+        p.style.display = hay.includes(q) ? '' : 'none';
+      });
+    });
+
+    // Scroll spy for nav active state
+    const sections = Array.from(document.querySelectorAll('section'));
+    const links = Array.from(document.querySelectorAll('nav a'));
+    const setActive = () => {
+      let idx = 0;
+      const pos = window.scrollY + 80;
+      sections.forEach((s, i) => { if (s.offsetTop <= pos) idx = i; });
+      links.forEach(l => l.classList.remove('active'));
+      const id = sections[idx]?.id;
+      const active = links.find(l => l.getAttribute('href') === '#' + id);
+      if (active) active.classList.add('active');
+    };
+    setActive();
+    window.addEventListener('scroll', setActive);
+  </script>
+</body>
+</html>
