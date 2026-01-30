@@ -10,137 +10,46 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://youyihuang.github.io/" />
   <link rel="icon" href="assets/favicon.png" />
-
   <style>
     :root{
-      --bg:#0b0c10;--surface:#111318;--text:#e6e6e6;--muted:#a7a7a7;
-      --brand:#4f7cff;--accent:#7bd389;--card:#151922;--border:#242834;--link:#9ab4ff;
+      --bg:#0b0c10;--surface:#111318;--text:#e6e6e6;--muted:#a7a7a7;--brand:#4f7cff;--accent:#7bd389;--card:#151922;--border:#242834;--link:#9ab4ff;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
     }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;
-        --brand:#315efb;--accent:#2f9e44;--card:#ffffff;--border:#e6e9ef;--link:#254eda;
-        --shadow: 0 10px 30px rgba(10,20,40,.08);
-      }
-    }
-
+    @media (prefers-color-scheme: light){:root{--bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;--brand:#315efb;--accent:#2f9e44;--card:#ffffff;--border:#e6e9ef;--link:#254eda;--shadow: 0 10px 30px rgba(10,20,40,.08);}}
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
-      font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica Neue,Arial,Noto Sans,Apple Color Emoji,Segoe UI Emoji
-    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica Neue,Arial,Noto Sans,Apple Color Emoji,Segoe UI Emoji}
     a{color:var(--link);text-decoration:none}
     a:hover{text-decoration:underline}
+    .topbar{position:sticky;top:0;z-index:20;backdrop-filter:saturate(180%) blur(14px);background: color-mix(in oklab, var(--bg) 82%, transparent);border-bottom:1px solid var(--border)}
+    .topbar .inner{max-width:1040px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.2px}
+    .brand-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));box-shadow:0 0 0 4px color-mix(in oklab, var(--brand) 20%, transparent)}
+    .nav a{display:inline-block;margin-left:10px;padding:8px 10px;border-radius:10px;border:1px solid transparent;font-weight:600}
+    .nav a:hover{text-decoration:none;border-color:var(--border);background: color-mix(in oklab, var(--card) 85%, transparent)}
+    .nav a[aria-current="page"]{border-color:var(--border);background: color-mix(in oklab, var(--card) 92%, transparent)}
     .wrap{max-width:1040px;margin:0 auto;padding:22px}
-
-    /* Top nav */
-    .topbar{
-      position:sticky;top:0;z-index:20;
-      backdrop-filter:saturate(180%) blur(14px);
-      background: color-mix(in oklab, var(--bg) 82%, transparent);
-      border-bottom:1px solid var(--border);
-    }
-    .topbar .inner{
-      max-width:1040px;margin:0 auto;padding:10px 22px;
-      display:flex;gap:14px;align-items:center;justify-content:space-between;
-    }
-    .brand{
-      display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.2px;
-    }
-    .brand-dot{
-      width:10px;height:10px;border-radius:50%;
-      background:linear-gradient(135deg,var(--brand),var(--accent));
-      box-shadow:0 0 0 4px color-mix(in oklab, var(--brand) 20%, transparent);
-    }
-    .nav a{
-      display:inline-block;margin-left:14px;
-      padding:8px 10px;border-radius:10px;
-      border:1px solid transparent;
-      font-weight:600;
-    }
-    .nav a:hover{
-      text-decoration:none;
-      border-color:var(--border);
-      background: color-mix(in oklab, var(--card) 85%, transparent);
-    }
-
-    /* Header */
-    header{
-      display:flex;gap:22px;align-items:center;
-      padding:26px 0 18px;
-    }
-    .avatar{
-      width:96px;height:96px;border-radius:50%;
-      object-fit:cover;border:2px solid var(--border);
-      box-shadow: var(--shadow);
-      background: var(--card);
-    }
+    header{display:flex;gap:22px;align-items:center;padding:26px 0 18px}
+    .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--border);box-shadow:var(--shadow);background:var(--card)}
     .title h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
     .title .affil{color:var(--muted)}
     .chipset{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .chip{
-      border:1px solid var(--border);
-      background: color-mix(in oklab, var(--card) 92%, transparent);
-      color:var(--text);
-      padding:6px 10px;border-radius:999px;font-size:13px
-    }
-
+    .chip{border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);color:var(--text);padding:6px 10px;border-radius:999px;font-size:13px}
     .links{margin-top:10px}
-    .links .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      border:1px solid var(--border);
-      background: color-mix(in oklab, var(--card) 92%, transparent);
-      font-weight:600;
-    }
+    .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);font-weight:600}
     .pill small{color:var(--muted);font-weight:600}
-
-    /* Sections */
     section{padding:26px 0;border-top:1px solid var(--border)}
     h2{margin:0 0 14px;font-size:22px}
-    h3{margin:18px 0 10px;font-size:18px}
-    p{margin:10px 0}
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:18px;
-    }
-    @media (max-width: 860px){
-      .grid{grid-template-columns:1fr}
-    }
-
-    .card{
-      border:1px solid var(--border);
-      background: color-mix(in oklab, var(--card) 92%, transparent);
-      border-radius:16px;
-      padding:16px 16px;
-      box-shadow: var(--shadow);
-    }
-    .meta{color:var(--muted)}
+    .grid{display:grid;grid-template-columns: 1.15fr .85fr;gap:18px}
+    @media (max-width: 860px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
     ul{margin:0;padding-left:20px}
     li{margin:8px 0}
-    .subtle{color:var(--muted)}
-    .kbd{
-      font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-      font-size: 13px;
-      padding:2px 8px;border-radius:8px;
-      border:1px solid var(--border);
-      background: color-mix(in oklab, var(--surface) 88%, transparent);
-      color: var(--text);
-    }
-
-    footer{
-      padding:24px 0;color:var(--muted);
-      font-size:14px;text-align:center;border-top:1px solid var(--border);
-      margin-top:14px;
-    }
+    .meta{color:var(--muted)}
+    footer{padding:24px 0;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--border);margin-top:14px}
   </style>
 </head>
-
 <body>
-  <!-- Sticky nav -->
   <div class="topbar">
     <div class="inner">
       <div class="brand">
@@ -148,15 +57,15 @@
         <span>Youyi Huang</span>
       </div>
       <div class="nav" aria-label="Primary">
-        <a href="#home">Home</a>
-        <a href="#teaching">Teaching</a>
-        <a href="#publications">Publications</a>
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="teaching.html">Teaching</a>
+        <a href="publications.html">Publications</a>
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <header id="home">
+    <header>
       <img class="avatar" src="assets/avatar.jpg" alt="Portrait of Youyi Huang" />
       <div class="title">
         <h1>Youyi Huang, Ph.D.</h1>
@@ -177,7 +86,6 @@
       </div>
     </header>
 
-    <!-- Main page content: About + Employment + Education -->
     <section aria-label="About and background">
       <div class="grid">
         <div class="card">
@@ -187,8 +95,8 @@
             University of Central Missouri. My research is at the intersection of random matrix theory and
             quantum information theory, with a focus on statistical and dynamical methods for entanglement estimation.
           </p>
-          <p class="subtle">
-            Tip: You can link directly to sections using <span class="kbd">#teaching</span> or <span class="kbd">#publications</span>.
+          <p class="meta">
+            See <a href="teaching.html">Teaching</a> and <a href="publications.html">Publications</a> for course offerings and research outputs.
           </p>
         </div>
 
@@ -209,114 +117,6 @@
           </p>
         </div>
       </div>
-    </section>
-
-    <!-- Teaching -->
-    <section id="teaching">
-      <h2>Teaching</h2>
-      <ul>
-        <li>CS 3400: Discrete Structures II — Spring 2026</li>
-        <li>CS 2400: Discrete Structures — Spring 2026</li>
-        <li>HONR 3000: Introduction to Quantum Computing — Fall 2025</li>
-        <li>CS 5110: Advanced C# and .NET — Fall 2025</li>
-        <li>CS 5110: Advanced C# and .NET — Spring 2025</li>
-      </ul>
-    </section>
-
-    <!-- Publications (two sessions: Papers + Presentations) -->
-    <section id="publications">
-      <h2>Publications</h2>
-
-      <h3>Papers</h3>
-      <ul>
-        <li>
-          L.-F. Wei, <b>Y. Huang</b>, and L. Wei,
-          “Skewness of von Neumann entropy over Bures-Hall random states,”
-          <i>arXiv:2506.06663</i>.
-        </li>
-        <li>
-          <b>Y. Huang</b> and L. Wei,
-          “Cumulant structures of entanglement entropy,”
-          Preprint, 2025.
-        </li>
-        <li>
-          L. Ye, <b>Y. Huang</b>, J. C. Osborn, and L. Wei,
-          “Square Root Statistics of Density Matrices and Their Applications,”
-          <i>Entropy</i>, 26(1), 68, 2024.
-        </li>
-        <li>
-          <b>Y. Huang</b> and L. Wei,
-          “Entropy fluctuation formulas of fermionic Gaussian states,”
-          <i>Annales Henri Poincaré</i>, 24, 4283–4342, 2023.
-        </li>
-        <li>
-          <b>Y. Huang</b> and L. Wei,
-          “Entanglement capacity of fermionic Gaussian states,”
-          <i>Journal of Physics A: Mathematical and Theoretical</i>, 56, 435201, 2023.
-        </li>
-        <li>
-          <b>Y. Huang</b> and L. Wei,
-          “Exact variances of von Neumann entropy over fermionic Gaussian states,”
-          <i>IEEE International Symposium on Information Theory (ISIT)</i>, 2023.
-        </li>
-        <li>
-          <b>Y. Huang</b> and L. Wei,
-          “Second-order statistics of fermionic Gaussian states,”
-          <i>Journal of Physics A: Mathematical and Theoretical</i>, 55, 105201, 2022.
-        </li>
-        <li>
-          <b>Y. Huang</b>, L. Wei, and B. Collaku,
-          “Kurtosis of von Neumann entanglement entropy,”
-          <i>Journal of Physics A: Mathematical and Theoretical</i>, 54, 504003, 2021.
-        </li>
-      </ul>
-
-      <h3>Presentations</h3>
-      <ul>
-        <li>
-          <b>Talk:</b> “Cumulant structures of entanglement entropy over Hilbert–Schmidt ensemble,”
-          <i>Log-gases in Caeli Australi: Recent Developments in and around Random Matrix Theory</i>,
-          MATRIX Institute, Creswick, Australia, Aug. 2025.
-        </li>
-        <li>
-          <b>Talk:</b> “Exact cumulants of von Neumann entropy,”
-          Katori Laboratory Seminar, Chuo University, Tokyo, Japan, July 2024.
-        </li>
-        <li>
-          <b>Poster:</b> “Entanglement capacity of fermionic Gaussian states,”
-          25th Annual Southwest Quantum Information and Technology Workshop,
-          Albuquerque, USA, Oct. 2023.
-        </li>
-        <li>
-          <b>Talk:</b> “Entropy fluctuation formulas of fermionic Gaussian states,”
-          Summer School on Random Matrix Theory and Its Applications,
-          Ohio State University, Columbus, USA, May 2023.
-        </li>
-        <li>
-          <b>Talk:</b> “Entropy fluctuation formulas of fermionic Gaussian states,”
-          Integrable Systems and Random Matrix Theory Seminar,
-          University of Michigan, Ann Arbor, USA, Jan. 2023.
-        </li>
-        <li>
-          <b>Talk:</b> “Entropy fluctuation formulas of fermionic Gaussian states,”
-          Random Matrix Theory Seminar, Bielefeld–Melbourne, Jan. 2023.
-        </li>
-        <li>
-          <b>Poster:</b> “Entropy fluctuation formulas of fermionic Gaussian states,”
-          24th Annual Southwest Quantum Information and Technology Workshop,
-          Berkeley, USA, Oct. 2022.
-        </li>
-        <li>
-          <b>Poster:</b> “Fermionic Gaussian states with and without particle number constraint,”
-          25th Annual Conference on Quantum Information Processing,
-          Pasadena, USA, Mar. 2022.
-        </li>
-        <li>
-          <b>Poster:</b> “Second-order statistics of fermionic Gaussian states,”
-          XVII Brunel–Bielefeld Workshop on Random Matrix Theory and Applications,
-          Bielefeld University, Germany, Dec. 2021.
-        </li>
-      </ul>
     </section>
 
     <footer>
