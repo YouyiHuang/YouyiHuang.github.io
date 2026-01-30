@@ -15,26 +15,31 @@
       --bg:#0b0c10;--surface:#111318;--text:#e6e6e6;--muted:#a7a7a7;--brand:#4f7cff;--accent:#7bd389;--card:#151922;--border:#242834;--link:#9ab4ff;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
     }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;--brand:#315efb;--accent:#2f9e44;--card:#f6f7fb;--border:#e6e9ef;--link:#254eda;
-        --shadow: 0 10px 30px rgba(10,20,40,.08);
-      }
-    }
+    @media (prefers-color-scheme: light){:root{--bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;--brand:#315efb;--accent:#2f9e44;--card:#f6f7fb;--border:#e6e9ef;--link:#254eda;--shadow: 0 10px 30px rgba(10,20,40,.08);}}
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica Neue,Arial,Noto Sans,Apple Color Emoji,Segoe UI Emoji}
 
-    /* Default links elsewhere */
-    a{color:var(--link);text-decoration:none}
+    /* Base link behavior (keep underline only on hover) */
+    a{color:inherit;text-decoration:none}
     a:hover{text-decoration:underline}
 
     .topbar{position:sticky;top:0;z-index:20;backdrop-filter:saturate(180%) blur(14px);background: color-mix(in oklab, var(--bg) 82%, transparent);border-bottom:1px solid var(--border)}
     .topbar .inner{max-width:1040px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;justify-content:space-between}
+
+    /* Brand (make clickable + colored only for the name) */
     .brand{display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.2px}
     .brand-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));box-shadow:0 0 0 4px color-mix(in oklab, var(--brand) 20%, transparent)}
+    .brand a{color:var(--link); text-decoration:none;}
+    .brand a:hover{text-decoration:underline;}
 
-    /* NAV layout only (colors come from .linkpill) */
-    .nav a{display:inline-block;margin-left:10px}
+    /* Nav links: colored text, rest unchanged */
+    .nav a{
+      display:inline-block;margin-left:10px;padding:8px 10px;border-radius:10px;border:1px solid transparent;font-weight:600;
+      color:var(--link);
+      text-decoration:none;
+    }
+    .nav a:hover{text-decoration:none;border-color:var(--border);background: color-mix(in oklab, var(--card) 85%, transparent)}
+    .nav a[aria-current="page"]{border-color:var(--border);background: color-mix(in oklab, var(--card) 92%, transparent)}
 
     .wrap{max-width:1040px;margin:0 auto;padding:22px}
     header{display:flex;gap:22px;align-items:center;padding:26px 0 18px}
@@ -45,7 +50,7 @@
     .chip{border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);color:var(--text);padding:6px 10px;border-radius:999px;font-size:13px}
     .links{margin-top:10px}
     .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);font-weight:600}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);font-weight:600;color:var(--link)}
     .pill small{color:var(--muted);font-weight:600}
 
     section{padding:26px 0;border-top:1px solid var(--border)}
@@ -56,6 +61,9 @@
     ul{margin:0;padding-left:20px}
     li{margin:8px 0}
     .meta{color:var(--muted)}
+    .meta a{color:var(--link); font-weight:600;}
+    .meta a:hover{text-decoration:underline;}
+
     footer{padding:24px 0;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--border);margin-top:14px}
     .center { display:flex; justify-content:center; }
     .center .card { width: 100%; }
@@ -76,9 +84,9 @@
     }
     .cvitem > div:last-child{
       min-width:0;
-      white-space:nowrap;     /* keeps one line on desktop */
+      white-space:nowrap;
       overflow:hidden;
-      text-overflow:ellipsis; /* prevents ugly wrapping if too long */
+      text-overflow:ellipsis;
     }
     .cvitem:first-child { border-top:none; }
     .when { color:var(--muted); font-weight:700; white-space:nowrap; }
@@ -88,28 +96,12 @@
       .when { white-space:normal; }
       .cvitem > div:last-child{ white-space:normal; overflow:visible; text-overflow:clip; }
     }
-
-    /* ===== Link pill (colored background for hyperlinks only) ===== */
-    a.linkpill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background: color-mix(in oklab, var(--brand) 16%, transparent);
-      color: var(--brand);
-      border: 1px solid color-mix(in oklab, var(--brand) 22%, var(--border));
-      text-decoration:none;
-      font-weight:600;
-    }
-    a.linkpill:hover{
-      background: color-mix(in oklab, var(--brand) 22%, transparent);
-      text-decoration:none;
-    }
-
-    /* Optional 3) active page stands out more */
-    .nav a[aria-current="page"].linkpill{
-      background: color-mix(in oklab, var(--brand) 28%, transparent);
-      border-color: color-mix(in oklab, var(--brand) 35%, var(--border));
-    }
+    .card-plain{
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;   /* optional: makes it feel like part of the page */
+}
   </style>
 </head>
 <body>
@@ -117,12 +109,12 @@
     <div class="inner">
       <div class="brand">
         <span class="brand-dot" aria-hidden="true"></span>
-        <a class="linkpill" href="index.html">Youyi Huang</a>
+        <a href="index.html" aria-label="Home">Youyi Huang</a>
       </div>
       <div class="nav" aria-label="Primary">
-        <a class="linkpill" href="index.html" aria-current="page">Home</a>
-        <a class="linkpill" href="teaching.html">Teaching</a>
-        <a class="linkpill" href="publications.html">Publications</a>
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="teaching.html">Teaching</a>
+        <a href="publications.html">Publications</a>
       </div>
     </div>
   </div>
@@ -151,20 +143,20 @@
 
     <section aria-label="Employment and education">
       <div class="center">
-        <div class="card">
+        <div class="card card-plain">
           <h2>Employment</h2>
           <ul class="cvlist">
             <li class="cvitem">
               <div class="when">01.2025 –</div>
               <div>
-                <b>Assistant Professor</b>, Department of Computer Science and Cybersecurity,
+               Assistant Professor, Department of Computer Science and Cybersecurity,
                 <span class="where">University of Central Missouri</span>
               </div>
             </li>
             <li class="cvitem">
               <div class="when">07.2024 – 01.2025</div>
               <div>
-                <b>Postdoctoral Research Associate</b>, Department of Computer Science,
+               Postdoctoral Research Associate, Department of Computer Science,
                 <span class="where">Texas Tech University</span>
               </div>
             </li>
@@ -174,24 +166,23 @@
           <ul class="cvlist edulist">
             <li class="cvitem">
               <div>
-                <b>Doctor of Philosophy in Computer Science</b>, Texas Tech University, USA, <span class="where">2024</span>
+               Doctor of Philosophy in Computer Science, Texas Tech University, USA, <span class="where">2024</span>
               </div>
             </li>
             <li class="cvitem">
               <div>
-                <b>Master of Science in Mechanical Engineering</b>, University of Michigan–Dearborn, USA, <span class="where">2017</span>
+               Master of Science in Mechanical Engineering, University of Michigan–Dearborn, USA, <span class="where">2017</span>
               </div>
             </li>
             <li class="cvitem">
               <div>
-                <b>Bachelor of Engineering in Mechanical and Dynamical Engineering</b>, Southeast University, China, <span class="where">2015</span>
+               Bachelor of Engineering in Mechanical and Dynamical Engineering, Southeast University, China, <span class="where">2015</span>
               </div>
             </li>
           </ul>
 
           <p class="meta" style="margin-top:12px">
-            See <a class="linkpill" href="teaching.html">Teaching</a> and
-            <a class="linkpill" href="publications.html">Publications</a> for course offerings and research outputs.
+            See <a href="teaching.html">Teaching</a> and <a href="publications.html">Publications</a> for course offerings and research outputs.
           </p>
         </div>
       </div>
