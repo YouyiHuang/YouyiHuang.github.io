@@ -49,6 +49,13 @@
     footer{padding:24px 0;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--border);margin-top:14px}
     .center { display:flex; justify-content:center; }
 .center .card { width: 100%; }
+    /* Education: left-align content (no date-column indentation) */
+.edulist .cvitem{
+  grid-template-columns: 1fr;
+}
+.edulist .when{
+  display:none;
+}
 
 /* Simple two-column rows for dates + description */
 .cvlist { list-style:none; padding:0; margin:0; }
@@ -134,23 +141,20 @@
       </ul>
 
       <h2 style="margin-top:18px">Education</h2>
-<ul class="cvlist">
+<ul class="cvlist edulist">
   <li class="cvitem">
-    <div class="when"></div>
     <div>
-      <b>Ph.D. in Computer Science</b>, Texas Tech University, USA, <span class="where">2024</span>
+      <b>Doctor of Philosophy (Ph.D.) in Computer Science</b>, Texas Tech University, USA, <span class="where">2024</span>
     </div>
   </li>
   <li class="cvitem">
-    <div class="when"></div>
     <div>
-      <b>M.Sc. in Mechanical Engineering</b>, University of Michigan–Dearborn, USA, <span class="where">2017</span>
+      <b>Master of Science (M.S.) in Mechanical Engineering</b>, University of Michigan–Dearborn, USA, <span class="where">2017</span>
     </div>
   </li>
   <li class="cvitem">
-    <div class="when"></div>
     <div>
-      <b>B.Eng. in Mechanical and Dynamical Engineering</b>, Southeast University, China, <span class="where">2015</span>
+      <b>Bachelor of Engineering (B.Eng.) in Mechanical and Dynamical Engineering</b>, Southeast University, China, <span class="where">2015</span>
     </div>
   </li>
 </ul>
