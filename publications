@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Publications — Youyi Huang</title>
+  <meta name="description" content="Publications and presentations for Youyi Huang." />
+  <link rel="icon" href="assets/favicon.png" />
+  <style>
+    :root{--bg:#0b0c10;--surface:#111318;--text:#e6e6e6;--muted:#a7a7a7;--brand:#4f7cff;--accent:#7bd389;--card:#151922;--border:#242834;--link:#9ab4ff;--shadow:0 10px 30px rgba(0,0,0,.25);}
+    @media (prefers-color-scheme: light){:root{--bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;--brand:#315efb;--accent:#2f9e44;--card:#ffffff;--border:#e6e9ef;--link:#254eda;--shadow:0 10px 30px rgba(10,20,40,.08);}}
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica Neue,Arial}
+    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+    .topbar{position:sticky;top:0;z-index:20;backdrop-filter:saturate(180%) blur(14px);background: color-mix(in oklab, var(--bg) 82%, transparent);border-bottom:1px solid var(--border)}
+    .topbar .inner{max-width:1040px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:10px;align-items:center;font-weight:700}
+    .brand-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent))}
+    .nav a{display:inline-block;margin-left:10px;padding:8px 10px;border-radius:10px;border:1px solid transparent;font-weight:600}
+    .nav a:hover{text-decoration:none;border-color:var(--border);background: color-mix(in oklab, var(--card) 85%, transparent)}
+    .nav a[aria-current="page"]{border-color:var(--border);background: color-mix(in oklab, var(--card) 92%, transparent)}
+    .wrap{max-width:1040px;margin:0 auto;padding:22px}
+    .card{border:1px solid var(--border);background: color-mix(in oklab, var(--card) 92%, transparent);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    section{padding:20px 0}
+    h1{margin:8px 0 10px;font-size:28px}
+    h2{margin:18px 0 10px;font-size:20px}
+    ul{margin:0;padding-left:20px} li{margin:10px 0}
+    .meta{color:var(--muted)}
+    footer{padding:24px 0;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--border);margin-top:14px}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand"><span class="brand-dot" aria-hidden="true"></span><span>Youyi Huang</span></div>
+      <div class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="teaching.html">Teaching</a>
+        <a href="publications.html" aria-current="page">Publications</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <h1>Publications</h1>
+      <p class="meta">Papers (journal + conference) and presentations (talks + posters), ordered from recent to earlier.</p>
+
+      <h2>Papers</h2>
+      <ul>
+        <li>L.-F. Wei, <b>Y. Huang</b>, and L. Wei, “Skewness of von Neumann entropy over Bures-Hall random states,” <i>arXiv:2506.06663</i>.</li>
+        <li><b>Y. Huang</b> and L. Wei, “Cumulant structures of entanglement entropy,” Preprint, 2025.</li>
+        <li>L. Ye, <b>Y. Huang</b>, J.C. Osborn, and L. Wei, “Square Root Statistics of Density Matrices and Their Applications,” <i>Entropy</i>, 26(1), 68, 2024.</li>
+        <li><b>Y. Huang</b> and L. Wei, “Entropy fluctuation formulas of fermionic Gaussian states,” <i>Annales Henri Poincaré</i>, 24, 4283–4342, 2023.</li>
+        <li><b>Y. Huang</b> and L. Wei, “Entanglement capacity of fermionic Gaussian states,” <i>Journal of Physics A: Mathematical and Theoretical</i>, 56, 435201, 2023.</li>
+        <li><b>Y. Huang</b> and L. Wei, “Exact variances of von Neumann entropy over fermionic Gaussian states,” <i>IEEE International Symposium on Information Theory (ISIT)</i>, 2023.</li>
+        <li><b>Y. Huang</b> and L. Wei, “Second-order statistics of fermionic Gaussian states,” <i>Journal of Physics A: Mathematical and Theoretical</i>, 55, 105201, 2022.</li>
+        <li><b>Y. Huang</b>, L. Wei, and B. Collaku, “Kurtosis of von Neumann entanglement entropy,” <i>Journal of Physics A: Mathematical and Theoretical</i>, 54, 504003, 2021.</li>
+      </ul>
+
+      <h2>Presentations</h2>
+      <ul>
+        <li><b>Talk:</b> “Cumulant structures of entanglement entropy over Hilbert–Schmidt ensemble,” Log-gases in Caeli Australi: Recent Developments in and around Random Matrix Theory, MATRIX Institute, Creswick, Australia, Aug. 2025.</li>
+        <li><b>Talk:</b> “Exact cumulants of von Neumann entropy,” Katori Laboratory Seminar, Chuo University, Tokyo, Japan, July 2024.</li>
+        <li><b>Poster:</b> “Entanglement capacity of fermionic Gaussian states,” 25th Annual Southwest Quantum Information and Technology Workshop, Albuquerque, USA, Oct. 2023.</li>
+        <li><b>Talk:</b> “Entropy fluctuation formulas of fermionic Gaussian states,” Summer School on Random Matrix Theory and Its Applications, Ohio State University, Columbus, USA, May 2023.</li>
+        <li><b>Talk:</b> “Entropy fluctuation formulas of fermionic Gaussian states,” Integrable Systems and Random Matrix Theory Seminar, University of Michigan, Ann Arbor, USA, Jan. 2023.</li>
+        <li><b>Talk:</b> “Entropy fluctuation formulas of fermionic Gaussian states,” Random Matrix Theory Seminar, Bielefeld–Melbourne, Jan. 2023.</li>
+        <li><b>Poster:</b> “Entropy fluctuation formulas of fermionic Gaussian states,” 24th Annual Southwest Quantum Information and Technology Workshop, Berkeley, USA, Oct. 2022.</li>
+        <li><b>Poster:</b> “Fermionic Gaussian states with and without particle number constraint,” 25th Annual Conference on Quantum Information Processing, Pasadena, USA, Mar. 2022.</li>
+        <li><b>Poster:</b> “Second-order statistics of fermionic Gaussian states,” XVII Brunel–Bielefeld Workshop on Random Matrix Theory and Applications, Bielefeld University, Germany, Dec. 2021.</li>
+      </ul>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Youyi Huang.
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
