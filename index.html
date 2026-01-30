@@ -15,7 +15,7 @@
       --bg:#0b0c10;--surface:#111318;--text:#e6e6e6;--muted:#a7a7a7;--brand:#4f7cff;--accent:#7bd389;--card:#151922;--border:#242834;--link:#9ab4ff;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
     }
-    @media (prefers-color-scheme: light){:root{--bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;--brand:#315efb;--accent:#2f9e44;--card:#ffffff;--border:#e6e9ef;--link:#254eda;--shadow: 0 10px 30px rgba(10,20,40,.08);}}
+    @media (prefers-color-scheme: light){:root{--bg:#ffffff;--surface:#f7f8fa;--text:#0e1116;--muted:#475169;--brand:#315efb;--accent:#2f9e44;--card:#f6f7fb;--border:#e6e9ef;--link:#254eda;--shadow: 0 10px 30px rgba(10,20,40,.08);}}
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica Neue,Arial,Noto Sans,Apple Color Emoji,Segoe UI Emoji}
     a{color:var(--link);text-decoration:none}
@@ -48,16 +48,23 @@
     .meta{color:var(--muted)}
     footer{padding:24px 0;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--border);margin-top:14px}
     .center { display:flex; justify-content:center; }
-.center .card { width: min(820px, 100%); }
+.center .card { width: 100%; }
 
 /* Simple two-column rows for dates + description */
 .cvlist { list-style:none; padding:0; margin:0; }
-.cvitem {
+.cvitem{
   display:grid;
-  grid-template-columns: 140px 1fr;
-  gap:14px;
+  grid-template-columns: 120px 1fr;
+  gap:16px;
   padding:10px 0;
   border-top:1px solid var(--border);
+  align-items:baseline;
+}
+.cvitem > div:last-child{
+  min-width:0;
+  white-space:nowrap;     /* keeps one line on desktop */
+  overflow:hidden;
+  text-overflow:ellipsis; /* prevents ugly wrapping if too long */
 }
 .cvitem:first-child { border-top:none; }
 .when { color:var(--muted); font-weight:700; white-space:nowrap; }
@@ -127,29 +134,26 @@
       </ul>
 
       <h2 style="margin-top:18px">Education</h2>
-      <ul class="cvlist">
-        <li class="cvitem">
-          <div class="when">2024</div>
-          <div>
-            <b>Ph.D. in Computer Science</b> (Advisor: Lu Wei),
-            <span class="where">Texas Tech University, USA</span>
-          </div>
-        </li>
-        <li class="cvitem">
-          <div class="when">2017</div>
-          <div>
-            <b>M.Sc. in Mechanical Engineering</b>,
-            <span class="where">University of Michigan–Dearborn, USA</span>
-          </div>
-        </li>
-        <li class="cvitem">
-          <div class="when">2015</div>
-          <div>
-            <b>B.Eng. in Mechanical and Dynamical Engineering</b>,
-            <span class="where">Southeast University, China</span>
-          </div>
-        </li>
-      </ul>
+<ul class="cvlist">
+  <li class="cvitem">
+    <div class="when"></div>
+    <div>
+      <b>Ph.D. in Computer Science</b>, Texas Tech University, USA, <span class="where">2024</span>
+    </div>
+  </li>
+  <li class="cvitem">
+    <div class="when"></div>
+    <div>
+      <b>M.Sc. in Mechanical Engineering</b>, University of Michigan–Dearborn, USA, <span class="where">2017</span>
+    </div>
+  </li>
+  <li class="cvitem">
+    <div class="when"></div>
+    <div>
+      <b>B.Eng. in Mechanical and Dynamical Engineering</b>, Southeast University, China, <span class="where">2015</span>
+    </div>
+  </li>
+</ul>
 
       <p class="meta" style="margin-top:12px">
         See <a href="teaching.html">Teaching</a> and <a href="publications.html">Publications</a> for course offerings and research outputs.
