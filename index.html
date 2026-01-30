@@ -74,14 +74,14 @@
 
     /* Simple two-column rows for dates + description */
     .cvlist { list-style:none; padding:0; margin:0; }
-    .cvitem{
-      display:grid;
-      grid-template-columns: 120px 1fr;
-      gap:16px;
-      padding:10px 0;
-      border-top:1px solid var(--border);
-      align-items:baseline;
-    }
+   .cvitem{
+  display:grid;
+  grid-template-columns: 120px 1fr;
+  gap:16px;
+  padding:10px 0;
+  border-top:none;            /* ✅ remove item dividers */
+  align-items:baseline;
+}
     .cvitem > div:last-child{
       min-width:0;
       white-space:nowrap;
