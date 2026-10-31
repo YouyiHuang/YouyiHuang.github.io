@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Euler Paths</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one sheet of graph paper. Rules strip on top, mode + level pickers, then the board (left) beside the trail log and controls (right); stacks on phones. */
+:root{
+  --paper:#edf1f4; --sheet:#fbfcfd; --grid:#dfe7ee; --line:#d2dbe4;
+  --ink:#15202b; --muted:#566676; --edge:#8796a5;
+  --trace:#2546d8; --trace-soft:rgba(37,70,216,.12); --on-trace:#ffffff;
+  --here:#d27c00; --here-soft:rgba(210,124,0,.18);
+  --bad:#c42f2b; --good:#17835a;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#0e141a; --sheet:#141c24; --grid:#1c2732; --line:#26323e;
+    --ink:#e3eaf0; --muted:#8e9fb0; --edge:#5f7081;
+    --trace:#809dff; --trace-soft:rgba(128,157,255,.16); --on-trace:#0a1230;
+    --here:#f5a524; --here-soft:rgba(245,165,36,.2);
+    --bad:#ff6b5f; --good:#46c18b; color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:22px 40px;
+}
+.wrap{max-width:1120px; margin:0 auto; display:grid; gap:16px}
+button{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--trace); outline-offset:2px}
+
+/* Header + rules */
+.top{display:grid; gap:12px}
+.titleline{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px}
+h1{font-family:var(--f-display); font-weight:800; font-size:clamp(30px,4.4vw,44px); letter-spacing:-.025em; line-height:1; margin:0; text-wrap:balance}
+h1 .arrow{color:var(--trace)}
+.tag{margin:0; color:var(--muted); font-size:15px}
+.rules{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0;
+  background:var(--sheet); border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.rule{padding:12px 16px; border-right:1px solid var(--line); min-width:0}
+.rule:last-child{border-right:0}
+.rk{font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--trace)}
+.rule p{margin:4px 0 0; font-size:14.5px}
+details.test{font-size:14px; color:var(--muted)}
+details.test summary{cursor:pointer; width:fit-content; font-weight:700; color:var(--ink)}
+details.test p{margin:6px 0 0; max-width:72ch}
+
+/* Mode + level pickers */
+.pickers{display:flex; flex-wrap:wrap; gap:10px 28px; align-items:center}
+.levels{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.levels .lbl{font-family:var(--f-mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin-right:4px; min-width:38px}
+.lv{
+  display:flex; flex-direction:column; align-items:flex-start; gap:0; padding:7px 14px 8px;
+  background:var(--sheet); border:1px solid var(--line); border-radius:8px; cursor:pointer; text-align:left;
+}
+.lv b{font-family:var(--f-display); font-weight:600; font-size:17px; line-height:1.2}
+.lv b{display:flex; align-items:center}
+.lv .glyph{width:22px; height:12px; margin-right:7px; fill:none; stroke:var(--trace); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none}
+.lv span{font-family:var(--f-mono); font-size:11px; color:var(--muted)}
+.lv[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.lv[aria-pressed="true"] span{color:var(--sheet); opacity:.75}
+.lv[aria-pressed="true"] .glyph{stroke:currentColor}
+.lv:hover:not([aria-pressed="true"]){border-color:var(--ink)}
+
+@media (max-width:600px){
+  .pickers{display:grid; gap:10px}
+  .levels{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:6px}
+  .levels .lbl{display:none}
+  .lv{padding:7px 10px 8px}
+  .lvl span i{display:block}
+  .lvl span i.dot{display:none}
+  .board .deg{font-size:18px}
+}
+.lv span i{font-style:normal}
+
+/* Stage */
+.stage{display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:16px; align-items:start}
+@media (max-width:840px){ .stage{grid-template-columns:minmax(0,1fr)} }
+.board{
+  background-color:var(--sheet);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; background-position:-1px -1px;
+  border:1px solid var(--line); border-radius:12px; min-width:0; position:relative;
+}
+.board svg{display:block; width:100%; height:auto; max-height:76vh; margin:0 auto; touch-action:manipulation}
+.boardnote{position:absolute; left:14px; top:10px; font-family:var(--f-mono); font-size:11px; color:var(--muted); letter-spacing:.04em; pointer-events:none}
+
+/* SVG */
+.vis{fill:none; stroke:var(--edge); stroke-width:2.4; stroke-linecap:round; transition:stroke .15s}
+.arrowhead{fill:var(--edge); transition:fill .15s}
+.hit{fill:none; stroke:transparent; stroke-width:26; cursor:pointer; pointer-events:stroke; outline:none}
+.edge:hover .vis,.edge:focus-within .vis{stroke:var(--ink)}
+.edge:hover .arrowhead,.edge:focus-within .arrowhead{fill:var(--ink)}
+.edge.next .vis{stroke:var(--here); stroke-width:3}
+.edge.next .arrowhead{fill:var(--here)}
+.edge.used .vis{stroke:var(--trace); stroke-width:4.2}
+.edge.used .arrowhead{fill:var(--trace)}
+.edge.used .hit{cursor:default}
+.edge.bad .vis{stroke:var(--bad); stroke-width:4}
+.edge.bad .arrowhead{fill:var(--bad)}
+.order{opacity:0; transition:opacity .2s; pointer-events:none}
+.order.show{opacity:1}
+.order circle{fill:var(--trace); stroke:var(--sheet); stroke-width:2}
+.order text{fill:var(--on-trace); font-family:var(--f-mono); font-weight:700; font-size:12px; text-anchor:middle; dominant-baseline:central}
+.node circle.body{fill:var(--sheet); stroke:var(--ink); stroke-width:2.2; transition:stroke .15s, fill .15s}
+.node circle.halo{fill:var(--here-soft); opacity:0; transition:opacity .2s}
+.node text.name{fill:var(--ink); font-family:var(--f-display); font-weight:800; font-size:19px; text-anchor:middle; dominant-baseline:central; pointer-events:none}
+.node.origin circle.body{fill:var(--trace-soft)}
+.node.here circle.body{stroke:var(--here); stroke-width:4}
+.node.here circle.halo{opacity:1}
+.node.flag circle.body{stroke:var(--bad); stroke-width:4}
+.deg{font-family:var(--f-mono); font-size:12px; fill:var(--muted); opacity:0; transition:opacity .2s}
+.showdeg .deg{opacity:1}
+.node.flag .deg{fill:var(--bad); font-weight:700}
+
+/* Panel */
+.panel{display:grid; gap:12px; min-width:0}
+.card{background:var(--sheet); border:1px solid var(--line); border-radius:10px; padding:14px 16px; min-width:0}
+.status .kicker{font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.status[data-kind="good"] .kicker{color:var(--good)}
+.status[data-kind="bad"] .kicker{color:var(--bad)}
+.status[data-kind="warn"] .kicker{color:var(--here)}
+.status[data-kind="info"] .kicker{color:var(--trace)}
+.status .msg p{margin:4px 0 0}
+.status[data-kind="good"]{border-color:var(--good)}
+.status[data-kind="bad"]{border-color:var(--bad)}
+.rowb{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.label{font-family:var(--f-mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.count{font-family:var(--f-mono); font-size:13px; font-variant-numeric:tabular-nums}
+.bar{height:6px; background:var(--grid); border-radius:3px; margin:8px 0 10px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--trace); transition:width .25s}
+.trail{margin:0; font-family:var(--f-mono); font-size:14px; line-height:1.7; word-break:break-word; color:var(--ink)}
+.trail .empty{color:var(--muted); font-family:var(--f-body)}
+.trail .ar{color:var(--muted); margin:0 2px}
+.actions{display:grid; gap:8px}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.btn{
+  padding:10px 14px; border-radius:8px; border:1px solid var(--line); background:var(--sheet);
+  font-weight:700; cursor:pointer; transition:border-color .15s, background .15s, opacity .15s;
+}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.btn.claim{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+.btn.primary{background:var(--trace); color:var(--on-trace); border-color:var(--trace)}
+.btn.primary:hover:not(:disabled){border-color:var(--ink)}
+.toggle{display:flex; gap:8px; align-items:center; font-size:14px; cursor:pointer}
+.toggle input{width:16px; height:16px; accent-color:var(--trace)}
+.score{font-family:var(--f-mono); font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; display:flex; flex-wrap:wrap; gap:4px 14px}
+.score b{color:var(--ink)}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="titleline">
+      <h1>Euler Paths<span class="arrow" id="h1arrow"></span></h1>
+      <p class="tag">Trace every edge exactly once, or prove it can't be done.</p>
+    </div>
+    <div class="rules" aria-label="Rules">
+      <div class="rule"><span class="rk">Trace</span><p>Click edges one at a time to build a trail that uses <b>every edge exactly once</b>.</p></div>
+      <div class="rule"><span class="rk" id="rule2k"></span><p id="rule2p"></p></div>
+      <div class="rule"><span class="rk">Or call it</span><p>If no such trail can exist, press “No Euler path exists” instead.</p></div>
+    </div>
+    <details class="test">
+      <summary>The test behind it</summary>
+      <p id="testText"></p>
+    </details>
+  </header>
+
+  <div class="pickers">
+    <div class="levels" role="group" aria-label="Edge type">
+      <span class="lbl">Edges</span>
+      <button class="lv md" data-mode="undirected" aria-pressed="false"><b><svg class="glyph" viewBox="0 0 22 12" aria-hidden="true"><path d="M2 6h18M6 2 2 6l4 4M16 2l4 4-4 4"/></svg>Two-way</b><span>travel either direction</span></button>
+      <button class="lv md" data-mode="directed" aria-pressed="false"><b><svg class="glyph" viewBox="0 0 22 12" aria-hidden="true"><path d="M2 6h18M16 2l4 4-4 4"/></svg>One-way</b><span>follow the arrows</span></button>
+    </div>
+    <div class="levels" role="group" aria-label="Difficulty">
+      <span class="lbl">Level</span>
+      <button class="lv lvl" data-level="easy" aria-pressed="false"><b>Easy</b><span></span></button>
+      <button class="lv lvl" data-level="medium" aria-pressed="false"><b>Medium</b><span></span></button>
+      <button class="lv lvl" data-level="hard" aria-pressed="false"><b>Hard</b><span></span></button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="board" id="board">
+      <span class="boardnote" id="boardnote"></span>
+      <svg id="svg" viewBox="0 -30 600 630" role="group" aria-label="Graph"></svg>
+    </div>
+
+    <section class="panel">
+      <div class="card status" id="status" data-kind="info" aria-live="polite">
+        <span class="kicker" id="kicker">Your move</span>
+        <div class="msg" id="msg"><p>Click any edge to start your trail.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="rowb"><span class="label">Your trail</span><span class="count" id="count">0 / 0 edges</span></div>
+        <div class="bar" aria-hidden="true"><span id="barfill"></span></div>
+        <p class="trail" id="trail"><span class="empty">No edges yet.</span></p>
+      </div>
+
+      <div class="actions">
+        <div class="pair">
+          <button class="btn" id="undo">Undo</button>
+          <button class="btn" id="clear">Clear trail</button>
+        </div>
+        <button class="btn claim" id="claim">No Euler path exists</button>
+        <button class="btn" id="reveal">Show answer</button>
+        <button class="btn primary" id="new">New graph</button>
+      </div>
+
+      <label class="toggle"><input type="checkbox" id="degToggle"> <span id="degLabel"></span></label>
+      <div class="score" id="score"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+// LOGIC START
+// mode: 'directed' (one-way edges) or 'undirected' (two-way edges).
+const LEVELS = {
+  directed: {
+    easy:   {label:'Easy',   n:[4,5], m:[5,7],   hint:true},
+    medium: {label:'Medium', n:[5,6], m:[8,11],  hint:false},
+    hard:   {label:'Hard',   n:[7,8], m:[12,16], hint:false},
+  },
+  undirected: {
+    easy:   {label:'Easy',   n:[4,5], m:[5,7],   hint:true},
+    medium: {label:'Medium', n:[5,6], m:[7,10],  hint:false},
+    hard:   {label:'Hard',   n:[7,8], m:[11,15], hint:false},
+  },
+};
+const LETTERS = 'ABCDEFGH';
+const rint = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const ukey = (a,b) => Math.min(a,b)+'-'+Math.max(a,b);
+const dkey = (a,b) => a+'>'+b;
+// Largest simple graph on n nodes: n(n-1) arcs if directed, n(n-1)/2 edges if undirected.
+const maxEdges = (mode,n) => mode==='directed' ? n*(n-1) : n*(n-1)/2;
+
+function components(n, edges){
+  const par=[...Array(n).keys()];
+  const find = x => par[x]===x ? x : (par[x]=find(par[x]));
+  const touched=Array(n).fill(false);
+  for(const e of edges){ par[find(e.u)] = find(e.v); touched[e.u]=touched[e.v]=true; }
+  const roots=new Set();
+  for(let v=0;v<n;v++) if(touched[v]) roots.add(find(v));
+  return roots.size;
+}
+
+// Directed: weakly connected, and every node balanced except at most one start (out = in + 1) and one end (in = out + 1).
+function analyzeDirected(n, edges){
+  const out=Array(n).fill(0), inn=Array(n).fill(0);
+  for(const e of edges){ out[e.u]++; inn[e.v]++; }
+  const pieces=components(n, edges);
+  const starts=[], ends=[], off=[];
+  for(let v=0;v<n;v++){ const d=out[v]-inn[v]; if(d===1) starts.push(v); else if(d===-1) ends.push(v); else if(d!==0) off.push(v); }
+  const reasons=[];
+  if(off.length) reasons.push({type:'off', nodes:off});
+  if(starts.length>1) reasons.push({type:'starts', nodes:starts});
+  if(ends.length>1) reasons.push({type:'ends', nodes:ends});
+  if(pieces>1) reasons.push({type:'split', count:pieces});
+  const ok = reasons.length===0;
+  const start = ok ? (starts.length ? starts[0] : edges[0].u) : null;
+  const end = ok ? (ends.length ? ends[0] : start) : null;
+  return {mode:'directed', ok, out, inn, starts, ends, reasons, start, end, circuit: ok && starts.length===0};
+}
+
+// Undirected: connected, and zero or two nodes of odd degree.
+function analyzeUndirected(n, edges){
+  const deg=Array(n).fill(0);
+  for(const e of edges){ deg[e.u]++; deg[e.v]++; }
+  const pieces=components(n, edges);
+  const odd=[]; for(let v=0;v<n;v++) if(deg[v]%2) odd.push(v);
+  const reasons=[];
+  if(odd.length>2) reasons.push({type:'odd', nodes:odd});
+  if(pieces>1) reasons.push({type:'split', count:pieces});
+  const ok = reasons.length===0;
+  const start = ok ? (odd.length ? odd[0] : edges[0].u) : null;
+  const end = ok ? (odd.length ? odd[1] : start) : null;
+  return {mode:'undirected', ok, deg, odd, reasons, start, end, circuit: ok && odd.length===0};
+}
+const analyze = (mode,n,edges) => mode==='directed' ? analyzeDirected(n,edges) : analyzeUndirected(n,edges);
+
+// A random walk that never repeats an edge: its edges always have an Euler path.
+function genTrail(mode, n, m){
+  const key = mode==='directed' ? dkey : ukey;
+  for(let t=0;t<400;t++){
+    const has=new Set(), edges=[]; let cur=rint(0,n-1); const seen=new Set([cur]); let ok=true;
+    for(let i=0;i<m;i++){
+      const cand=[]; for(let v=0;v<n;v++) if(v!==cur && !has.has(key(cur,v))) cand.push(v);
+      if(!cand.length){ ok=false; break; }
+      const fresh=cand.filter(v=>!seen.has(v));
+      const v = (fresh.length && Math.random()<0.65) ? pick(fresh) : pick(cand);
+      has.add(key(cur,v)); edges.push({u:cur, v}); seen.add(v); cur=v;
+    }
+    if(ok && seen.size===n) return edges;
+  }
+  return null;
+}
+
+// Start from a valid trail, then break it: flip, add or remove one edge, or split off a separate loop.
+function genBroken(mode, n, m, level){
+  const directed = mode==='directed';
+  const key = directed ? dkey : ukey;
+  const modes = directed ? ['reverse','reverse','add','remove'] : ['add','add','remove','remove'];
+  if(level!=='easy' && (directed ? n>=5 : n>=6)) modes.push(...(directed ? ['split','split'] : ['split']));
+  const kind=pick(modes);
+  if(kind==='split'){
+    // A two-way loop needs 3 nodes (no doubled edges); a one-way loop can be a 2-node back-and-forth.
+    const k = directed ? ((n>=7 && Math.random()<0.5)?3:2) : 3, main=n-k;
+    const mm=Math.min(m-k, maxEdges(mode,main)-1);
+    if(mm<main-1) return null;
+    const base=genTrail(mode, main, mm); if(!base) return null;
+    for(let i=0;i<k;i++) base.push({u:main+i, v:main+((i+1)%k)});
+    return base;
+  }
+  const base=genTrail(mode, n, kind==='add'?m-1 : kind==='remove'?m+1 : m); if(!base) return null;
+  const has=new Set(base.map(e=>key(e.u,e.v)));
+  if(kind==='reverse'){
+    const i=rint(0,base.length-1), e=base[i];
+    if(has.has(key(e.v,e.u))) return null;
+    base[i]={u:e.v, v:e.u};
+  } else if(kind==='add'){
+    const u=rint(0,n-1), v=rint(0,n-1);
+    if(u===v || has.has(key(u,v))) return null;
+    base.push({u,v});
+  } else {
+    base.splice(rint(0,base.length-1),1);
+  }
+  return base;
+}
+
+function genGraph(mode, level){
+  const L=LEVELS[mode][level];
+  const wantOk=Math.random()<0.55;
+  for(let t=0;t<3000;t++){
+    const n=rint(L.n[0],L.n[1]);
+    // Keep at least one edge missing so the walk has room to move.
+    const m=Math.min(rint(L.m[0],L.m[1]), maxEdges(mode,n)-1);
+    const edges = wantOk ? genTrail(mode,n,m) : genBroken(mode,n,m,level);
+    // Broken graphs can come out smaller than asked; keep each level within about one edge of its range.
+    if(!edges || edges.length < L.m[0]-1) continue;
+    const info=analyze(mode,n,edges);
+    if(info.ok!==wantOk) continue;
+    const touched=Array(n).fill(false); edges.forEach(e=>{touched[e.u]=touched[e.v]=true;});
+    if(touched.some(x=>!x)) continue;
+    return {n, edges, info};
+  }
+  const edges=genTrail(mode,4,5); return {n:4, edges, info:analyze(mode,4,edges)};
+}
+
+// Place nodes on a circle; try many orderings and keep the one with the fewest chord crossings.
+function layout(n, edges){
+  const pairs=[], seen=new Set();
+  for(const e of edges){ const k=ukey(e.u,e.v); if(!seen.has(k)){ seen.add(k); pairs.push([e.u,e.v]); } }
+  const crossings = perm => {
+    let c=0;
+    for(let i=0;i<pairs.length;i++){
+      let a=perm[pairs[i][0]], b=perm[pairs[i][1]]; if(a>b) [a,b]=[b,a];
+      for(let j=i+1;j<pairs.length;j++){
+        const p=perm[pairs[j][0]], q=perm[pairs[j][1]];
+        if(p===a||p===b||q===a||q===b) continue;
+        const inP=p>a&&p<b, inQ=q>a&&q<b;
+        if(inP!==inQ) c++;
+      }
+    }
+    return c;
+  };
+  let best=null, bestC=Infinity;
+  for(let t=0;t<150;t++){
+    const perm=shuffle([...Array(n).keys()]);
+    const c=crossings(perm);
+    if(c<bestC){ bestC=c; best=perm; }
+  }
+  return best;
+}
+
+// Hierholzer's algorithm: returns the steps {i, from, to} of an Euler path starting at s.
+function hierholzer(mode, n, edges, s){
+  const directed = mode==='directed';
+  const adj=Array.from({length:n},()=>[]);
+  edges.forEach((e,i)=>{ adj[e.u].push(i); if(!directed) adj[e.v].push(i); });
+  adj.forEach(a=>shuffle(a));
+  const used=Array(edges.length).fill(false);
+  const stack=[{v:s, step:null}], path=[];
+  while(stack.length){
+    const top=stack[stack.length-1], a=adj[top.v];
+    while(a.length && used[a[a.length-1]]) a.pop();
+    if(a.length){
+      const i=a.pop(); used[i]=true;
+      const e=edges[i], w = e.u===top.v ? e.v : e.u;
+      stack.push({v:w, step:{i, from:top.v, to:w}});
+    } else { stack.pop(); if(top.step) path.push(top.step); }
+  }
+  return path.reverse();
+}
+// LOGIC END
+if (typeof document === 'undefined') { globalThis.__euler = {LEVELS, analyze, genTrail, genBroken, genGraph, layout, hierholzer, maxEdges}; return; }
+
+const NS='http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const svg=$('svg'), board=$('board');
+const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CX=300, CY=300, R=198, NR=23;
+
+function store(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function load(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+const blankScore = () => ({easy:{s:0,st:0,b:0}, medium:{s:0,st:0,b:0}, hard:{s:0,st:0,b:0}});
+
+const MODE_TEXT = {
+  undirected: {
+    arrow:' ↔', name:'Two-way',
+    rule2k:'Keep it connected',
+    rule2p:'Edges go both ways. Each new edge must touch the node where your trail currently ends.',
+    test:'An undirected graph has an Euler path exactly when its edges form one connected piece and zero or two nodes have odd degree (the number of edges touching a node). With two odd nodes, the path must start at one and end at the other. With none, the path is a circuit and can start anywhere.',
+    degLabel:'Show degrees on nodes',
+  },
+  directed: {
+    arrow:' →', name:'One-way',
+    rule2k:'Follow the arrows',
+    rule2p:'Edges are one-way. Each new edge must start at the node where your last edge ended.',
+    test:'A directed graph has an Euler path exactly when its edges form one connected piece (ignoring direction) and every node has in-degree equal to out-degree, except possibly one start node with out = in + 1 and one end node with in = out + 1. If every node is balanced, the path is a circuit and can start anywhere.',
+    degLabel:'Show in/out counts on nodes',
+  },
+};
+
+// A ?mode=two-way or ?mode=one-way link opens straight into that version.
+const urlMode = (()=>{ try{ const q=new URLSearchParams(location.search).get('mode'); return ({'two-way':'undirected','undirected':'undirected','one-way':'directed','directed':'directed'})[q]; }catch(e){ return null; } })();
+let mode = urlMode || load('ep-mode', 'undirected');
+if(!LEVELS[mode]) mode='undirected';
+let level = load('ep-level', 'easy');
+if(!LEVELS[mode][level]) level='easy';
+let showDeg = load('ep-deg', load('owe-deg', false));
+let score = load('ep-score', null);
+if(!score || !score.directed || !score.undirected) score = {directed: load('owe-score', blankScore()), undirected: blankScore()};
+let round = 0;
+let G=null, trail=[], over=false, forceDeg=false, timers=[];
+
+const directed = () => mode==='directed';
+function el(tag, attrs, parent){ const x=document.createElementNS(NS,tag); for(const k in attrs) x.setAttribute(k, attrs[k]); if(parent) parent.appendChild(x); return x; }
+const lbl = v => G.label[v];
+const list = vs => { const n=vs.map(lbl); return n.length<=2 ? n.join(' and ') : n.slice(0,-1).join(', ')+' and '+n[n.length-1]; };
+const plural = (k, w) => `${k} ${w}${k===1?'':'s'}`;
+const sep = () => directed() ? '→' : '–';
+const edgeName = e => `${lbl(e.u)} ${sep()} ${lbl(e.v)}`;
+const isUsed = i => trail.some(t=>t.i===i);
+const touches = (e,v) => e.u===v || e.v===v;
+// The open ends of the trail: with one two-way edge, either end can still grow.
+function trailEnds(){
+  if(!trail.length) return [];
+  if(!directed() && trail.length===1) return [trail[0].from, trail[0].to];
+  return [trail[trail.length-1].to];
+}
+const canLeave = (e,v) => directed() ? e.u===v : touches(e,v);
+
+function setStatus(kind, kicker, lines){
+  const s=$('status'); s.dataset.kind=kind; $('kicker').textContent=kicker;
+  const box=$('msg'); box.textContent='';
+  (Array.isArray(lines)?lines:[lines]).forEach(t=>{ const p=document.createElement('p'); p.textContent=t; box.appendChild(p); });
+}
+
+function explain(info){
+  const out=[];
+  for(const r of info.reasons){
+    if(r.type==='off') r.nodes.forEach(v=>out.push(`${lbl(v)} has ${info.out[v]} out and ${info.inn[v]} in. A node can be off balance by at most 1.`));
+    if(r.type==='starts') out.push(`${list(r.nodes)} each have one more out than in. A trail has only one start.`);
+    if(r.type==='ends') out.push(`${list(r.nodes)} each have one more in than out. A trail has only one end.`);
+    if(r.type==='odd'){
+      const names=r.nodes.map(v=>`${lbl(v)} (${info.deg[v]})`);
+      const joined = names.length<=2 ? names.join(' and ') : names.slice(0,-1).join(', ')+' and '+names[names.length-1];
+      out.push(`${r.nodes.length} nodes have odd degree: ${joined}.`);
+      out.push('Every time a trail passes through a node it uses two of its edges, so only the start and end can have odd degree. That allows at most two.');
+    }
+    if(r.type==='split') out.push(`The edges form ${r.count} separate pieces, so one trail can't reach all of them.`);
+  }
+  return out;
+}
+
+function flagNodes(info){
+  const f=new Set();
+  for(const r of info.reasons) if(r.nodes) r.nodes.forEach(v=>f.add(v));
+  G.nodes.forEach((nd,v)=>nd.g.classList.toggle('flag', f.has(v)));
+  forceDeg=true;
+}
+
+function applyModeText(){
+  const t=MODE_TEXT[mode];
+  $('h1arrow').textContent=t.arrow;
+  $('rule2k').textContent=t.rule2k;
+  $('rule2p').textContent=t.rule2p;
+  $('testText').textContent=t.test;
+  $('degLabel').textContent=t.degLabel;
+  svg.setAttribute('aria-label', directed() ? 'Directed graph' : 'Undirected graph');
+  document.querySelectorAll('.lvl').forEach(b=>{
+    const L=LEVELS[mode][b.dataset.level];
+    const sub=b.querySelector('span'); sub.textContent='';
+    [[`${L.n[0]}–${L.n[1]} nodes`,''],[' · ','dot'],[`${L.m[0]}–${L.m[1]} edges`,'']].forEach(([t,c])=>{ const i=document.createElement('i'); i.textContent=t; if(c) i.className=c; sub.appendChild(i); });
+  });
+}
+
+function newRound(){
+  timers.forEach(clearTimeout); timers=[];
+  const g=genGraph(mode, level);
+  const perm=layout(g.n, g.edges);
+  G={n:g.n, info:g.info, perm, label:[], nodes:[], edges:g.edges.map(e=>({u:e.u, v:e.v}))};
+  for(let v=0;v<G.n;v++) G.label[v]=LETTERS[perm[v]];
+  trail=[]; over=false; forceDeg=false; round++;
+  applyModeText();
+  build();
+  $('boardnote').textContent = `${MODE_TEXT[mode].name} · ${LEVELS[mode][level].label} · graph #${round}`;
+  setStatus('info','Your move',[`Click any edge to start your trail. ${plural(G.edges.length,'edge')} to trace.`]);
+  render();
+}
+
+function build(){
+  svg.textContent='';
+  const pos=[];
+  for(let v=0;v<G.n;v++){ const a=-Math.PI/2 + G.perm[v]*2*Math.PI/G.n; pos[v]={x:CX+R*Math.cos(a), y:CY+R*Math.sin(a), a}; }
+  const gE=el('g',{},svg), gO=el('g',{},svg), gN=el('g',{},svg);
+  const f = x => x.toFixed(1);
+  G.edges.forEach((e,i)=>{
+    const p=pos[e.u], q=pos[e.v];
+    const dx=q.x-p.x, dy=q.y-p.y, L=Math.hypot(dx,dy), nx=-dy/L, ny=dx/L;
+    // Opposite one-way arcs between the same pair bow apart so both stay clickable.
+    const twin=directed() && G.edges.some(g=>g.u===e.v && g.v===e.u);
+    const bend=twin?24:0;
+    const C={x:(p.x+q.x)/2+nx*bend*2, y:(p.y+q.y)/2+ny*bend*2};
+    const unit=(a,b)=>{ const x=b.x-a.x, y=b.y-a.y, l=Math.hypot(x,y); return {x:x/l, y:y/l}; };
+    const us=unit(p,C), ue=unit(q,C);
+    const S={x:p.x+us.x*(NR+2), y:p.y+us.y*(NR+2)};
+    const g=el('g',{class:'edge'},gE);
+    let dFwd, dRev, hitD, mid;
+    if(directed()){
+      const tip={x:q.x+ue.x*(NR+3), y:q.y+ue.y*(NR+3)};
+      const d={x:-ue.x, y:-ue.y};
+      const AL=14, AW=7.5;
+      const base={x:tip.x-d.x*AL, y:tip.y-d.y*AL};
+      dFwd=`M${f(S.x)},${f(S.y)} Q${f(C.x)},${f(C.y)} ${f(base.x)},${f(base.y)}`;
+      dRev=dFwd;
+      hitD=`M${f(S.x)},${f(S.y)} Q${f(C.x)},${f(C.y)} ${f(tip.x)},${f(tip.y)}`;
+      el('path',{class:'vis', d:dFwd},g);
+      el('polygon',{class:'arrowhead', points:`${f(tip.x)},${f(tip.y)} ${f(base.x-d.y*AW)},${f(base.y+d.x*AW)} ${f(base.x+d.y*AW)},${f(base.y-d.x*AW)}`},g);
+      mid={x:.25*S.x+.5*C.x+.25*base.x, y:.25*S.y+.5*C.y+.25*base.y};
+    } else {
+      const T={x:q.x+ue.x*(NR+2), y:q.y+ue.y*(NR+2)};
+      dFwd=`M${f(S.x)},${f(S.y)} L${f(T.x)},${f(T.y)}`;
+      dRev=`M${f(T.x)},${f(T.y)} L${f(S.x)},${f(S.y)}`;
+      hitD=dFwd;
+      el('path',{class:'vis', d:dFwd},g);
+      mid={x:(S.x+T.x)/2, y:(S.y+T.y)/2};
+    }
+    const vis=g.querySelector('.vis');
+    const hit=el('path',{class:'hit', d:hitD, tabindex:'0', role:'button'},g);
+    hit.addEventListener('click',()=>onEdge(i));
+    hit.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); onEdge(i); } });
+    const og=el('g',{class:'order'},gO);
+    el('circle',{cx:f(mid.x), cy:f(mid.y), r:'11'},og);
+    const ot=el('text',{x:f(mid.x), y:f(mid.y)},og);
+    Object.assign(G.edges[i],{g, vis, hit, og, ot, dFwd, dRev});
+  });
+  for(let v=0;v<G.n;v++){
+    const p=pos[v];
+    const g=el('g',{class:'node'},gN);
+    el('circle',{class:'halo', cx:p.x, cy:p.y, r:NR+11},g);
+    el('circle',{class:'body', cx:p.x, cy:p.y, r:NR},g);
+    const t=el('text',{class:'name', x:p.x, y:p.y+1},g); t.textContent=G.label[v];
+    // Degree labels sit just outside the node and are anchored away from it, so they never cover the node at any size.
+    const dx=Math.cos(p.a), dy=Math.sin(p.a), gap=NR+10;
+    const lx=p.x+dx*gap, ly=p.y+dy*gap;
+    const anchor = dx>0.35 ? 'start' : dx<-0.35 ? 'end' : 'middle';
+    const lines = directed() ? [`in ${G.info.inn[v]}`, `out ${G.info.out[v]}`] : [`deg ${G.info.deg[v]}`];
+    const k=lines.length, LH=1.25;
+    const firstDy = dy*k*LH/2 - (k-1)*LH/2 + 0.35;
+    const dt=el('text',{class:'deg', x:f(lx), y:f(ly), 'text-anchor':anchor},g);
+    lines.forEach((t,j)=>{ const ts=el('tspan',{x:f(lx), dy:`${(j ? LH : firstDy).toFixed(2)}em`},dt); ts.textContent=t; });
+    G.nodes[v]={g};
+  }
+}
+
+function render(){
+  const pos=new Map(trail.map((t,k)=>[t.i,k]));
+  const ends = over ? [] : trailEnds();
+  const singleOpen = !directed() && trail.length===1;
+  const origin = trail.length && !singleOpen ? trail[0].from : null;
+  const hint = LEVELS[mode][level].hint;
+  G.edges.forEach((e,i)=>{
+    const k=pos.get(i), used=k!==undefined;
+    e.g.classList.toggle('used', used);
+    e.g.classList.toggle('next', hint && !over && ends.length>0 && !used && ends.some(v=>canLeave(e,v)));
+    e.og.classList.toggle('show', used);
+    if(used){
+      e.ot.textContent=String(k+1);
+      // Two-way edges are redrawn in the direction they were travelled, so the draw-in animation runs the right way.
+      if(!directed()) e.vis.setAttribute('d', trail[k].from===e.u ? e.dFwd : e.dRev);
+    }
+    e.hit.setAttribute('aria-label', `Edge ${directed() ? `${lbl(e.u)} to ${lbl(e.v)}` : `between ${lbl(e.u)} and ${lbl(e.v)}`}${used?`, step ${k+1}`:''}`);
+  });
+  G.nodes.forEach((nd,v)=>{
+    nd.g.classList.toggle('here', ends.includes(v));
+    nd.g.classList.toggle('origin', v===origin);
+  });
+  board.classList.toggle('showdeg', showDeg || forceDeg);
+  $('degToggle').checked = showDeg;
+
+  const m=G.edges.length;
+  $('count').textContent = `${trail.length} / ${m} edges`;
+  $('barfill').style.width = `${(trail.length/m)*100}%`;
+  const tr=$('trail'); tr.textContent='';
+  if(!trail.length){ const s=document.createElement('span'); s.className='empty'; s.textContent='No edges yet.'; tr.appendChild(s); }
+  else {
+    const seq=[trail[0].from, ...trail.map(t=>t.to)];
+    seq.forEach((v,k)=>{
+      if(k){ const a=document.createElement('span'); a.className='ar'; a.textContent=sep(); tr.appendChild(a); }
+      tr.appendChild(document.createTextNode(lbl(v)));
+    });
+  }
+  $('undo').disabled = over || !trail.length;
+  $('clear').disabled = over || !trail.length;
+  $('claim').disabled = over;
+  $('reveal').disabled = over;
+  document.querySelectorAll('.lvl').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.level===level)));
+  document.querySelectorAll('.md').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.mode===mode)));
+  const sc=score[mode][level];
+  $('score').textContent='';
+  [['Solved',sc.s],['Streak',sc.st],['Best streak',sc.b]].forEach(([k,v])=>{
+    const s=document.createElement('span'); s.append(`${k} `); const b=document.createElement('b'); b.textContent=v; s.appendChild(b); $('score').appendChild(s);
+  });
+}
+
+function drawIn(e){
+  if(reduce) return;
+  const p=e.vis, L=p.getTotalLength();
+  p.style.transition='none'; p.style.strokeDasharray=L; p.style.strokeDashoffset=L;
+  p.getBoundingClientRect();
+  p.style.transition='stroke-dashoffset .3s ease-out, stroke .15s';
+  p.style.strokeDashoffset='0';
+  timers.push(setTimeout(()=>{ p.style.strokeDasharray=''; p.style.strokeDashoffset=''; p.style.transition=''; }, 340));
+}
+function flash(i){
+  const g=G.edges[i].g; g.classList.add('bad');
+  timers.push(setTimeout(()=>g.classList.remove('bad'), 650));
+}
+
+function onEdge(i){
+  if(over){ setStatus($('status').dataset.kind, $('kicker').textContent, [...[...$('msg').children].map(p=>p.textContent).filter(t=>!t.startsWith('Press New graph')), 'Press New graph for another one.']); return; }
+  const e=G.edges[i];
+  const at=trail.findIndex(t=>t.i===i);
+  if(at>=0){ flash(i); setStatus('bad','Already used',[`${edgeName(e)} is step ${at+1} of your trail. Each edge can be used only once.`]); return; }
+  let step=null, flipped=false;
+  if(!trail.length){
+    step={i, from:e.u, to:e.v};
+  } else if(directed()){
+    const cur=trail[trail.length-1].to;
+    if(e.u!==cur){
+      flash(i);
+      setStatus('bad','Wrong way',[ e.v===cur
+        ? `That edge points into ${lbl(cur)}, not out of it. Edges are one-way.`
+        : `That edge starts at ${lbl(e.u)}. Your trail is at ${lbl(cur)}, so the next edge has to leave ${lbl(cur)}.`]);
+      return;
+    }
+    step={i, from:e.u, to:e.v};
+  } else {
+    const cur=trail[trail.length-1].to;
+    if(touches(e,cur)){
+      step={i, from:cur, to: e.u===cur ? e.v : e.u};
+    } else if(trail.length===1 && touches(e, trail[0].from)){
+      // The first two-way edge had no set direction yet: turn it around so the trail grows from the other end.
+      const f=trail[0]; trail[0]={i:f.i, from:f.to, to:f.from}; flipped=true;
+      const c=trail[0].to;
+      step={i, from:c, to: e.u===c ? e.v : e.u};
+    } else {
+      flash(i);
+      setStatus('bad','Not connected',[ trail.length===1
+        ? `That edge doesn't touch ${lbl(trail[0].from)} or ${lbl(trail[0].to)}, the two ends of your trail.`
+        : `That edge doesn't touch ${lbl(cur)}. Your trail ends at ${lbl(cur)}, so the next edge has to start there.`]);
+      return;
+    }
+  }
+  trail.push(step); render(); drawIn(e);
+  if(flipped) drawIn(G.edges[trail[0].i]);
+  const m=G.edges.length;
+  if(trail.length===m){ win(); return; }
+  const left=m-trail.length;
+  const ends=trailEnds();
+  const exits=G.edges.some((f,j)=>!isUsed(j) && ends.some(v=>canLeave(f,v)));
+  if(!exits){
+    const where = ends.length===2 ? `${lbl(ends[0])} or ${lbl(ends[1])}` : lbl(ends[0]);
+    setStatus('warn','Stuck',[`No unused edge ${directed()?'leaves':'touches'} ${where}, and ${plural(left,'edge')} ${left===1?'is':'are'} left.`, 'Undo a few steps, or clear the trail and start somewhere else.']);
+  } else if(trail.length===1 && !directed()){
+    setStatus('info','Your move',[`Trail started: ${lbl(step.from)} – ${lbl(step.to)}. You can continue from either end. ${plural(left,'edge')} to go.`]);
+  } else {
+    const lines=[`You're at ${lbl(step.to)}. ${plural(left,'edge')} to go.`];
+    if(flipped) lines.unshift(`Your trail now starts at ${lbl(trail[0].from)}.`);
+    setStatus('info','Your move',lines);
+  }
+}
+
+function bump(won){
+  const sc=score[mode][level];
+  if(won){ sc.s++; sc.st++; sc.b=Math.max(sc.b, sc.st); } else sc.st=0;
+  store('ep-score', score);
+}
+
+function win(){
+  over=true; bump(true);
+  const info=G.info, s=trail[0].from, t=trail[trail.length-1].to;
+  let lines;
+  if(directed()){
+    lines = info.circuit
+      ? ['Every edge traced exactly once.', `Every node has in = out, so this one is an Euler circuit: your trail ended where it began, at ${lbl(s)}.`]
+      : ['Every edge traced exactly once.', `It had to start at ${lbl(info.start)}, the one node with out = in + 1, and end at ${lbl(info.end)}, the one with in = out + 1.`];
+  } else {
+    lines = info.circuit
+      ? ['Every edge traced exactly once.', `Every node has even degree, so this one is an Euler circuit: your trail ended where it began, at ${lbl(s)}.`]
+      : ['Every edge traced exactly once.', `${list(info.odd)} are the only nodes with odd degree, so the trail had to run between them. Yours went from ${lbl(s)} to ${lbl(t)}.`];
+  }
+  setStatus('good', info.circuit ? 'Euler circuit found' : 'Euler path found', lines);
+  render();
+}
+
+function claim(){
+  if(over) return;
+  if(!G.info.ok){
+    over=true; bump(true); flagNodes(G.info);
+    setStatus('good','Correct, no Euler path', explain(G.info));
+  } else {
+    bump(false);
+    setStatus('bad','This one has a path',[
+      'An Euler path does exist here. Your streak resets.',
+      directed()
+        ? 'Check the in/out counts: at most one node may have one extra out (the start) and one extra in (the end), and all edges are connected.'
+        : 'Check the degrees: an Euler path needs zero or two nodes of odd degree, and all edges connected.'
+    ]);
+  }
+  render();
+}
+
+function reveal(){
+  if(over) return;
+  over=true; bump(false);
+  if(!G.info.ok){
+    flagNodes(G.info);
+    setStatus('warn','Answer: no Euler path', explain(G.info));
+    render(); return;
+  }
+  const info=G.info;
+  const sol=hierholzer(mode, G.n, G.edges, info.start);
+  trail=[]; render();
+  let first;
+  if(directed()) first = `One Euler path starts at ${lbl(info.start)}${info.circuit?' (every node is balanced, so it is a circuit and could start anywhere)':', the node with out = in + 1'}.`;
+  else first = info.circuit
+    ? `One Euler circuit starts at ${lbl(info.start)}. Every node has even degree, so it could start anywhere.`
+    : `One Euler path starts at ${lbl(info.start)} and ends at ${lbl(info.end)}, the two odd-degree nodes. It could also run the other way.`;
+  setStatus('warn','Answer', [first, 'Press New graph to try another.']);
+  const stepMs = reduce ? 0 : 280;
+  sol.forEach((st,k)=>{
+    timers.push(setTimeout(()=>{ trail.push(st); render(); drawIn(G.edges[st.i]); }, stepMs*k));
+  });
+}
+
+$('undo').addEventListener('click',()=>{ if(over||!trail.length) return; trail.pop(); render();
+  if(trail.length===1 && !directed()) setStatus('info','Your move',[`Back to ${lbl(trail[0].from)} – ${lbl(trail[0].to)}. You can continue from either end.`]);
+  else if(trail.length){ const cur=trail[trail.length-1].to; setStatus('info','Your move',[`Back at ${lbl(cur)}. ${plural(G.edges.length-trail.length,'edge')} to go.`]); }
+  else setStatus('info','Your move',['Click any edge to start your trail.']); });
+$('clear').addEventListener('click',()=>{ if(over) return; trail=[]; render(); setStatus('info','Your move',['Trail cleared. Click any edge to start again.']); });
+$('claim').addEventListener('click',claim);
+$('reveal').addEventListener('click',reveal);
+$('new').addEventListener('click',newRound);
+$('degToggle').addEventListener('change',ev=>{ showDeg=ev.target.checked; store('ep-deg', showDeg); render(); });
+document.querySelectorAll('.lvl').forEach(b=>b.addEventListener('click',()=>{ if(level===b.dataset.level) return; level=b.dataset.level; store('ep-level', level); round=0; newRound(); }));
+document.querySelectorAll('.md').forEach(b=>b.addEventListener('click',()=>{ if(mode===b.dataset.mode) return; mode=b.dataset.mode; store('ep-mode', mode); round=0; newRound(); }));
+
+newRound();
+})();
+</script>
+</body>
+</html>
