@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tower of Hanoi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --paper:#edf1f4; --sheet:#fbfcfd; --grid:#dfe7ee; --line:#d2dbe4;
+  --ink:#15202b; --muted:#566676; --edge:#8796a5;
+  --trace:#2546d8; --trace-soft:rgba(37,70,216,.12); --on-trace:#ffffff;
+  --here:#d27c00; --here-soft:rgba(210,124,0,.18);
+  --bad:#c42f2b; --good:#17835a;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#0e141a; --sheet:#141c24; --grid:#1c2732; --line:#26323e;
+    --ink:#e3eaf0; --muted:#8e9fb0; --edge:#5f7081;
+    --trace:#809dff; --trace-soft:rgba(128,157,255,.16); --on-trace:#0a1230;
+    --here:#f5a524; --here-soft:rgba(245,165,36,.2);
+    --bad:#ff6b5f; --good:#46c18b; color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding:22px 16px 40px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:16px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--trace);outline-offset:2px}
+.top{display:grid;gap:12px}
+.titleline{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,4.4vw,44px);letter-spacing:-.025em;line-height:1;margin:0}
+h1 .accent{color:var(--trace)}
+.tag{margin:0;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.rule{padding:12px 16px;border-right:1px solid var(--line)}
+.rule:last-child{border-right:0}
+.rk{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--trace)}
+.rule p{margin:4px 0 0;font-size:14.5px}
+details.test{font-size:14px;color:var(--muted)}
+details.test summary{cursor:pointer;width:fit-content;font-weight:700;color:var(--ink)}
+details.test p{margin:6px 0 0;max-width:72ch}
+.levels{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.levels .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.lv{min-width:52px;padding:8px 12px;background:var(--sheet);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:17px}
+.lv[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
+.lv:hover:not([aria-pressed="true"]){border-color:var(--ink)}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+@media (max-width:840px){.stage{grid-template-columns:minmax(0,1fr)}}
+.board{background-color:var(--sheet);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;background-position:-1px -1px;border:1px solid var(--line);border-radius:12px;position:relative;padding:44px 12px 18px}
+.boardnote{position:absolute;left:14px;top:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.pegs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;height:clamp(260px,52vh,420px)}
+.peg{position:relative;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;border:0;background:transparent;border-radius:10px;cursor:pointer;padding:0 0 14px;transition:background .15s}
+.peg:hover{background:var(--trace-soft)}
+.peg.sel{background:var(--here-soft)}
+.peg.target{box-shadow:inset 0 0 0 2px var(--line)}
+.peg::before{content:"";position:absolute;left:50%;bottom:14px;width:8px;height:86%;transform:translateX(-50%);background:var(--edge);border-radius:4px 4px 0 0;z-index:0}
+.peg::after{content:"";position:absolute;left:4%;right:4%;bottom:6px;height:8px;background:var(--edge);border-radius:4px}
+.peg .name{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--muted)}
+.disk{position:relative;z-index:1;height:var(--dh,26px);margin-top:3px;border-radius:7px;background:hsl(var(--h) 62% 52%);border:2px solid hsl(var(--h) 55% 36%);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;font-size:12px;color:#fff;transition:transform .15s}
+.disk.lift{transform:translateY(-14px);box-shadow:0 6px 0 var(--here-soft)}
+.disk.bad{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.panel{display:grid;gap:12px;min-width:0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.status .kicker{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--trace)}
+.status[data-kind="good"]{border-color:var(--good)} .status[data-kind="good"] .kicker{color:var(--good)}
+.status[data-kind="bad"]{border-color:var(--bad)} .status[data-kind="bad"] .kicker{color:var(--bad)}
+.status[data-kind="warn"] .kicker{color:var(--here)}
+.status p{margin:4px 0 0}
+.rowb{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.label{font-family:var(--f-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.count{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.big{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.big small{font-family:var(--f-mono);font-size:13px;font-weight:500;color:var(--muted)}
+.bar{height:6px;background:var(--grid);border-radius:3px;margin:8px 0 2px;overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--trace);transition:width .25s}
+.bar.over span{background:var(--here)}
+.actions{display:grid;gap:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--sheet);font-weight:700;cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.claim{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+.btn.primary{background:var(--trace);color:var(--on-trace);border-color:var(--trace)}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.score{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
+.score b{color:var(--ink)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="titleline">
+      <h1>Tower of Hanoi<span class="accent"> ⟲</span></h1>
+      <p class="tag">Move the whole tower from A to C in as few moves as possible.</p>
+    </div>
+    <div class="rules" aria-label="Rules">
+      <div class="rule"><span class="rk">One at a time</span><p>Click a peg to pick up its top disk, then click another peg to drop it.</p></div>
+      <div class="rule"><span class="rk">Small on big</span><p>A disk can never sit on top of a <b>smaller</b> disk.</p></div>
+      <div class="rule"><span class="rk">Beat the minimum</span><p>Finish on peg C. Can you match the fewest possible moves?</p></div>
+    </div>
+    <details class="test">
+      <summary>The math behind it</summary>
+      <p>To move n disks, first move the top n − 1 disks out of the way, move the largest disk, then move the n − 1 disks back on top of it. So the minimum number of moves satisfies T(n) = 2·T(n − 1) + 1 with T(1) = 1, which solves to T(n) = 2ⁿ − 1. No strategy can do better, because the largest disk must move at least once, and each time it moves the other n − 1 disks must all be stacked on the third peg.</p>
+    </details>
+  </header>
+
+  <div class="levels" role="group" aria-label="Number of disks">
+    <span class="lbl">Disks</span>
+    <span id="levelBtns" style="display:contents"></span>
+  </div>
+
+  <div class="stage">
+    <div class="board">
+      <span class="boardnote" id="boardnote"></span>
+      <div class="pegs" id="pegs"></div>
+    </div>
+
+    <section class="panel">
+      <div class="card status" id="status" data-kind="info" aria-live="polite">
+        <span class="kicker" id="kicker">Your move</span>
+        <div id="msg"><p>Click peg A to pick up the top disk.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="rowb"><span class="label">Moves</span><span class="count" id="minline"></span></div>
+        <div class="big" id="moves">0</div>
+        <div class="bar" id="bar" aria-hidden="true"><span id="barfill"></span></div>
+      </div>
+
+      <div class="actions">
+        <div class="pair">
+          <button class="btn" id="undo">Undo</button>
+          <button class="btn" id="reset">Restart</button>
+        </div>
+        <button class="btn claim" id="hintBtn">Hint: next best move</button>
+        <button class="btn" id="solve">Show solution</button>
+      </div>
+      <p class="hint">Keyboard: press 1, 2, 3 to pick and drop.</p>
+      <div class="score" id="score"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+const MIN_N=3, MAX_N=8, NAMES=['A','B','C'];
+const $=id=>document.getElementById(id);
+const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+
+let n=load('hanoi-n',4); if(n<MIN_N||n>MAX_N) n=4;
+let best=load('hanoi-best',{});
+let pegs, history, sel, over, timers=[], autoplay=false;
+
+const optimal=k=>Math.pow(2,k)-1;
+
+// Optimal next move from any legal position toward "all disks on peg C".
+function nextMove(state){
+  const where=[]; state.forEach((p,i)=>p.forEach(d=>where[d]=i));
+  function go(d,t){
+    if(d<1) return null;
+    if(where[d]===t) return go(d-1,t);
+    const aux=3-where[d]-t;
+    return go(d-1,aux) || [where[d],t];
+  }
+  return go(n,2);
+}
+
+function buildLevels(){
+  const box=$('levelBtns'); box.textContent='';
+  for(let k=MIN_N;k<=MAX_N;k++){
+    const b=document.createElement('button'); b.className='lv'; b.textContent=k;
+    b.setAttribute('aria-pressed',String(k===n));
+    b.addEventListener('click',()=>{ if(k===n) return; n=k; store('hanoi-n',n); newGame(); });
+    box.appendChild(b);
+  }
+}
+
+function setStatus(kind,kicker,lines){
+  $('status').dataset.kind=kind; $('kicker').textContent=kicker;
+  const m=$('msg'); m.textContent='';
+  (Array.isArray(lines)?lines:[lines]).forEach(t=>{const p=document.createElement('p');p.textContent=t;m.appendChild(p);});
+}
+
+function newGame(){
+  timers.forEach(clearTimeout); timers=[]; autoplay=false;
+  pegs=[[],[],[]]; for(let d=n;d>=1;d--) pegs[0].push(d);
+  history=[]; sel=null; over=false;
+  document.querySelectorAll('.lv').forEach(b=>b.setAttribute('aria-pressed',String(+b.textContent===n)));
+  setStatus('info','Your move',[`Move all ${n} disks to peg C. The minimum is ${optimal(n)} moves.`]);
+  render();
+}
+
+function render(badDisk){
+  const box=$('pegs'); box.textContent='';
+  const maxW=0.94, minW=0.28;
+  const dh=Math.max(16,Math.min(30,Math.floor(300/n)));
+  pegs.forEach((p,i)=>{
+    const b=document.createElement('button'); b.className='peg'+(sel===i?' sel':'')+(i===2?' target':'');
+    b.setAttribute('aria-label',`Peg ${NAMES[i]}, ${p.length} disk${p.length===1?'':'s'}${p.length?`, top disk ${p[p.length-1]}`:''}`);
+    b.addEventListener('click',()=>onPeg(i));
+    p.forEach((d,j)=>{
+      const el=document.createElement('div'); el.className='disk';
+      el.style.width=`${(minW+(maxW-minW)*(d-1)/Math.max(1,n-1))*100}%`;
+      el.style.setProperty('--h',String(215-(d-1)*(185/Math.max(1,n-1))));
+      el.style.setProperty('--dh',dh+'px');
+      el.textContent=d;
+      if(sel===i && j===p.length-1) el.classList.add('lift');
+      if(badDisk===d) el.classList.add('bad');
+      b.appendChild(el);
+    });
+    const nm=document.createElement('span'); nm.className='name'; nm.textContent=NAMES[i]; b.appendChild(nm);
+    box.appendChild(b);
+  });
+  const m=history.length, opt=optimal(n);
+  $('moves').innerHTML=''; $('moves').append(String(m)); const s=document.createElement('small'); s.textContent=` / ${opt} min`; $('moves').appendChild(s);
+  $('minline').textContent=`${pegs[2].length} of ${n} on C`;
+  $('barfill').style.width=`${Math.min(1,m/opt)*100}%`;
+  $('bar').classList.toggle('over',m>opt);
+  $('boardnote').textContent=`${n} disks · minimum 2^${n} − 1 = ${opt}`;
+  $('undo').disabled=over||autoplay||!m;
+  $('reset').disabled=autoplay;
+  $('hintBtn').disabled=over||autoplay;
+  $('solve').disabled=over||autoplay;
+  const b=best[n];
+  $('score').innerHTML='';
+  [['Best',b==null?'—':b],['Minimum',opt]].forEach(([k,v])=>{const sp=document.createElement('span');sp.append(k+' ');const bb=document.createElement('b');bb.textContent=v;sp.appendChild(bb);$('score').appendChild(sp);});
+}
+
+function onPeg(i){
+  if(autoplay) return;
+  if(over){ setStatus($('status').dataset.kind,$('kicker').textContent,[...[...$('msg').children].map(p=>p.textContent).filter(t=>!t.startsWith('Press Restart')),'Press Restart or pick a disk count to play again.']); return; }
+  if(sel===null){
+    if(!pegs[i].length){ setStatus('bad','Empty peg',[`Peg ${NAMES[i]} has no disks to pick up.`]); return; }
+    sel=i; render();
+    setStatus('info','Holding disk '+top(i),[`Now click the peg to drop disk ${top(i)} on.`]);
+    return;
+  }
+  if(sel===i){ sel=null; render(); setStatus('info','Your move',['Put it back. Pick a peg.']); return; }
+  tryMove(sel,i);
+}
+const top=i=>pegs[i][pegs[i].length-1];
+
+function tryMove(a,b){
+  const d=top(a), t=top(b);
+  if(t!==undefined && t<d){
+    sel=null; render(d);
+    setStatus('bad','Not allowed',[`Disk ${d} can't go on disk ${t}. A bigger disk never sits on a smaller one.`]);
+    return false;
+  }
+  pegs[b].push(pegs[a].pop()); history.push([a,b]); sel=null;
+  if(pegs[2].length===n){ finish(); return true; }
+  render();
+  if(!autoplay){
+    const opt=optimal(n), m=history.length;
+    setStatus('info','Your move',[`Disk ${d}: ${NAMES[a]} → ${NAMES[b]}.`, m>opt?`You're past the minimum of ${opt}. Keep going, or restart to try for a perfect run.`:`${m} move${m===1?'':'s'} so far.`]);
+  }
+  return true;
+}
+
+function finish(){
+  over=true; const m=history.length, opt=optimal(n);
+  const wasAuto=autoplay; autoplay=false;
+  if(!wasAuto && (best[n]==null||m<best[n])){ best[n]=m; store('hanoi-best',best); }
+  render();
+  if(wasAuto) setStatus('warn','Solution shown',[`That's the optimal ${opt}-move solution: move ${n-1} disks to B, the largest to C, then the ${n-1} back on top.`,'Press Restart to try it yourself.']);
+  else if(m===opt) setStatus('good','Perfect solve',[`${m} moves, the fewest possible (2^${n} − 1).`, n<MAX_N?`Try ${n+1} disks: it takes ${optimal(n+1)}.`:'You solved the largest tower.']);
+  else setStatus('good','Tower moved',[`${m} moves. The minimum is ${opt}, so ${m-opt} extra.`, 'Restart and try for a perfect run.']);
+}
+
+$('undo').addEventListener('click',()=>{ if(over||autoplay||!history.length) return; const [a,b]=history.pop(); pegs[a].push(pegs[b].pop()); sel=null; render(); setStatus('info','Undone',[`Disk ${top(a)} went back to ${NAMES[a]}.`]); });
+$('reset').addEventListener('click',newGame);
+$('hintBtn').addEventListener('click',()=>{
+  if(over||autoplay) return;
+  const mv=nextMove(pegs); if(!mv) return;
+  sel=mv[0]; render();
+  setStatus('warn','Hint',[`Move disk ${top(mv[0])} from ${NAMES[mv[0]]} to ${NAMES[mv[1]]}. It's lifted for you; click ${NAMES[mv[1]]} to drop it.`]);
+});
+$('solve').addEventListener('click',()=>{
+  if(over||autoplay) return;
+  newGame(); autoplay=true; render();
+  setStatus('warn','Solving',[`Watching the optimal ${optimal(n)}-move solution…`]);
+  const step=reduce?60:Math.max(90,Math.min(450,6000/optimal(n)));
+  const tick=()=>{ if(!autoplay) return; const mv=nextMove(pegs); if(!mv) return; tryMove(mv[0],mv[1]); if(autoplay) timers.push(setTimeout(tick,step)); };
+  timers.push(setTimeout(tick,step));
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea')) return;
+  const k={'1':0,'2':1,'3':2}[e.key]; if(k!==undefined){ e.preventDefault(); onPeg(k); }
+  if(e.key==='Escape' && sel!==null){ sel=null; render(); }
+});
+
+buildLevels(); newGame();
+})();
+</script>
+</body>
+</html>
